@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+*{
+  box-sizing: border-box;
+}
+
+@theme {
+  --color-pri: #050118;
+  --color-purple-1: #413062;
+  --color-purple-2: #2d2145;
+  --color-purple-3: #262334;
+  --color-purple-4: #1c1929;
+  --color-pink-glass: rgba(246, 51, 154, 0.1);
+  --color-pink-glass-2: rgba(246, 51, 154, 0.2);
+}
+
+body{
+  background-color: var(--color-pri);
+}
+
+@keyframes pinkGlow {
+  0% {
+    box-shadow: 0 0 20px #f9a8d4; /* pink-300 */
+  }
+  50% {
+    box-shadow: 0 0 35px #ec4899; /* pink-500 */
+  }
+  100% {
+    box-shadow: 0 0 50px #831843; /* pink-900 */
+  }
+}
+
+.pink-glow {
+  animation: pinkGlow 2s infinite alternate;
+}
