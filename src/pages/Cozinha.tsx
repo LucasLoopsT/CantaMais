@@ -114,26 +114,26 @@ export default function Cozinha(){
     const list = tab === "preparar" ? orders : doneOrders
 
     return(
-        <div className="space-y-6">
-            <div className="max-h[20vh] flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl text-white font-bold">Cozinha</h1>
+        <div className="space-y-4 sm:space-y-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0">
+                    <h1 className="text-2xl sm:text-3xl text-white font-bold">Cozinha</h1>
                     {list.length > 0 && (
-                        <p className="text-pink-400">{list.length} pedidos {tab === "preparar" ? "pendentes" : "prontos"}</p>
+                        <p className="text-sm sm:text-base text-pink-400">{list.length} pedidos {tab === "preparar" ? "pendentes" : "prontos"}</p>
                     )}
                 </div>
                 {/* Tabs */}
-                <div className="flex gap-4">
-                    <button onClick={()=>setTab("preparar")} className={`px-5 py-2 rounded-lg transition cursor-pointer ${tab === "preparar" ? "bg-pink-600 text-white hover:bg-pink-800" : "bg-purple-4 text-pink-300 hover:bg-purple-3"}`}>
+                <div className="flex flex-wrap gap-2 sm:gap-4 shrink-0">
+                    <button onClick={()=>setTab("preparar")} className={`px-4 sm:px-5 py-2 rounded-lg text-sm sm:text-base transition cursor-pointer ${tab === "preparar" ? "bg-pink-600 text-white hover:bg-pink-800" : "bg-purple-4 text-pink-300 hover:bg-purple-3"}`}>
                         Preparar
                     </button>
-                    <button onClick={()=>setTab("entregues")} className={`px-5 py-2 rounded-lg transition cursor-pointer ${tab === "entregues" ? "bg-pink-600 text-white hover:bg-pink-800" : "bg-purple-4 text-pink-300 hover:bg-purple-3"}`}>
+                    <button onClick={()=>setTab("entregues")} className={`px-4 sm:px-5 py-2 rounded-lg text-sm sm:text-base transition cursor-pointer ${tab === "entregues" ? "bg-pink-600 text-white hover:bg-pink-800" : "bg-purple-4 text-pink-300 hover:bg-purple-3"}`}>
                         Entregues
                     </button>
                 </div>
             </div>
             {/* Lista */}
-            <div className={`rounded-xl p-6 overflow-y-auto h-full max-h-[80vh] ${tab === "preparar" ? "bg-pink-glass" : "bg-green-500/10"} border`}>
+            <div className={`rounded-xl p-4 sm:p-6 overflow-y-auto h-full max-h-[calc(100dvh-12rem)] sm:max-h-[80vh] ${tab === "preparar" ? "bg-pink-glass" : "bg-green-500/10"} border`}>
                 {list.length === 0 && (
                     <p className={`text-${tab === "preparar" ? "pink" : "green"}-400`}>
                         {tab === "preparar" ? "Nenhum pedido pendente" : "Nenhum pedido entregue"}
@@ -143,9 +143,9 @@ export default function Cozinha(){
                     {list.map(order => (
                         <div key={order.id} className={`border rounded-xl p-4 ${tab === "preparar" ? "bg-purple-4 border-purple-3" : "bg-green-900/40 border-green-900"}`}>
                             {/* header */}
-                            <div className="flex justify-between items-center mb-3">
-                                <div>
-                                    <p className="text-white font-semibold">
+                            <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center mb-3">
+                                <div className="min-w-0">
+                                    <p className="text-white font-semibold text-sm sm:text-base">
                                         Mesa {order.table} - Comanda {order.tab}
                                     </p>
                                     <p className={`text-xs ${tab === "preparar" ? "text-pink-400" : "text-green-300"}`}>
@@ -155,7 +155,7 @@ export default function Cozinha(){
                                 {tab === "preparar" && (
                                     <button
                                         onClick={()=>setConfirmOrder(order)}
-                                        className="bg-green-600 hover:bg-green-800 cursor-pointer transition text-white px-4 py-2 rounded-lg text-sm"
+                                        className="bg-green-600 hover:bg-green-800 cursor-pointer transition text-white px-4 py-2 rounded-lg text-sm shrink-0 self-start sm:self-auto"
                                     >
                                         Marcar pronto
                                     </button>

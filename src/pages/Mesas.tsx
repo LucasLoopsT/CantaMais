@@ -71,12 +71,14 @@ export default function Mesas() {
   const comandasAtivas = comandas.filter((c) => c.status === "Ativa");
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between max-h[20vh]">
-        <h1 className="text-3xl text-white font-bold">Controle de Mesas</h1>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-2xl sm:text-3xl text-white font-bold shrink-0">
+          Controle de Mesas
+        </h1>
 
         {/* Tabs */}
-        <div className="flex gap-4">
+        <div className="flex flex-wrap gap-2 sm:gap-4">
           <button
             onClick={() => setTab("comandas")}
             className={`px-5 py-2 rounded-lg cursor-pointer transition hover:opacity-90 ${
@@ -111,8 +113,8 @@ export default function Mesas() {
       )}
 
       {/* THEAD */}
-      <div className="text-pink-400 sticky top-0 bg-purple-5 z-10 bg-pink-glass-2 rounded-t-2xl p-4 pr-8 m-0">
-        <ul className="flex">
+      <div className="text-pink-400 sticky top-0 z-10 bg-pink-glass-2 rounded-t-2xl p-3 sm:p-4 sm:pr-8 m-0 overflow-x-auto">
+        <ul className="flex min-w-max sm:min-w-0 w-full">
           {tab === "comandas" ? (
             <>
               <li className="w-1/4 text-center font-semibold border-r-4 border-pink-glass-2">
@@ -151,8 +153,8 @@ export default function Mesas() {
 
       {/* COMANDAS */}
       {tab === "comandas" && (
-        <div className="bg-pink-glass rounded-b-xl p-4 space-y-4 max-h-[65vh] overflow-y-auto">
-          <div className="overflow-x-auto">
+        <div className="bg-pink-glass rounded-b-xl p-3 sm:p-4 space-y-4 max-h-[55vh] sm:max-h-[65vh] overflow-y-auto">
+          <div className="overflow-x-auto -mx-1 px-1 sm:mx-0 sm:px-0">
             <table className="w-full text-left">
               <tbody className="text-white">
                 {filtered.map((c) => (
@@ -220,8 +222,8 @@ export default function Mesas() {
       {/* MESAS */}
 
       {tab === "mesas" && (
-        <div className="bg-pink-glass rounded-b-xl p-6 max-h-[75vh] overflow-y-auto">
-          <div className="overflow-x-auto">
+        <div className="bg-pink-glass rounded-b-xl p-3 sm:p-6 max-h-[55vh] sm:max-h-[75vh] overflow-y-auto">
+          <div className="overflow-x-auto -mx-1 px-1 sm:mx-0 sm:px-0">
             <table className="w-full text-left">
               <tbody className="text-white">
                 {mesas.map((mesa) => (
@@ -253,11 +255,11 @@ export default function Mesas() {
 
                     <td className="w-1/6 text-center">{totalPessoas(mesa)}</td>
 
-                    <div className="flex justify-center">
+                    <td className="w-1/6 text-center">
                       <input
                         type="number"
                         value={mesa.musicas}
-                        className="w-16 bg-purple-4 rounded px-2 py-1"
+                        className="w-14 sm:w-16 bg-purple-4 rounded px-2 py-1 mx-auto"
                         onChange={(e) => {
                           const value = Number(e.target.value);
 
@@ -268,7 +270,7 @@ export default function Mesas() {
                           );
                         }}
                       />
-                    </div>
+                    </td>
 
                     <td className="w-1/6 text-center">
                       <button

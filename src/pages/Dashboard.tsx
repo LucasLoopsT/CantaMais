@@ -1,11 +1,11 @@
 export default function Dashboard(){
     return(
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
             <div>
-                <h1 className="text-3xl text-white font-bold">
+                <h1 className="text-2xl sm:text-3xl text-white font-bold">
                     Visão Geral
                 </h1>
-                <p className="text-pink-400">
+                <p className="text-sm sm:text-base text-pink-400">
                     Acompanhe métricas do sistema
                 </p>
             </div>

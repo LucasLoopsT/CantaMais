@@ -1,7 +1,8 @@
 // Imports
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createHashRouter, RouterProvider } from "react-router-dom";
+import ProtectedRoute from "./Protected.route.tsx";
 import { Toaster } from "react-hot-toast";
 // Telas - Clientes
 import Home from "./pages/Home";
@@ -13,17 +14,17 @@ import Karaoke from "./pages/Karaoke";
 import Login from "./pages/Login";
 import AdminLayout from "./components/AdminLayout";
 import Dashboard from "./pages/Dashboard";
-import Cozinha from "./pages/Cozinha";
-// import Pedidos from './pages/Pedidos';
 import Mesas from "./pages/Mesas";
+import Cozinha from "./pages/Cozinha";
+import KaraokeControl from "./pages/KaraokeControl";
+// import Pedidos from './pages/Pedidos';
 // import Gerenciar from './pages/Gerenciar';
-// import KaraokeControl from './pages/KaraokeControl';
 // Styles
 import "./index.css";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
-const router = createBrowserRouter([
+const router = createHashRouter([
   {
     path: "/",
     element: <Home />,
@@ -50,36 +51,33 @@ const router = createBrowserRouter([
   },
   {
     path: "/admin",
-    element: <AdminLayout />,
-
+    element: <ProtectedRoute />,
     children: [
       {
-        path: "dashboard",
-        element: <Dashboard />,
+        element: <AdminLayout />,
+        children: [
+          {
+            index: true,
+            element: <Dashboard />,
+          },
+          {
+            path: "dashboard",
+            element: <Dashboard />,
+          },
+          {
+            path: "mesas",
+            element: <Mesas />,
+          },
+          {
+            path: "cozinha",
+            element: <Cozinha />,
+          },
+          {
+            path: "karaoke",
+            element: <KaraokeControl />,
+          },
+        ],
       },
-
-      {
-        path: "mesas",
-        element: <Mesas />,
-      },
-      {
-        path: "cozinha",
-        element: <Cozinha />,
-      },
-      // {
-      // path:"pedidos",
-      // element:<Pedidos/>
-      // },
-
-      // {
-      // path:"gerenciar",
-      // element:<Gerenciar/>
-      // },
-
-      // {
-      // path:"karaoke",
-      // element:<KaraokeControl/>
-      // }
     ],
   },
 ]);

@@ -279,10 +279,12 @@ function Item() {
       productId: produto.id,
       name: produto.name,
       price: produto.price,
-      extras: extrasSelecionados
-    }
+      extras: extrasSelecionados,
+    };
 
-    toast.success(`${produto.name} adicionado ao carrinho!`)
+    console.log("Pedido (mock)", itemPedido);
+
+    toast.success(`${produto.name} adicionado ao carrinho!`);
 
     setOpenDialog(true)
   }
