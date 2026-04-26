@@ -100,9 +100,11 @@ O projeto segue uma arquitetura modular baseada em frontend, com separação cla
 
 ## 🧪 Acesso de Teste
 
-**Funcionário**
+Acesse a rota: https://lucasloopst.github.io/CantaMais/#/login
+
+E logue com as credenciais de **Funcionário**
 - Email: `teste@gmail.com`  
-- Senha: `123456789`  
+- Senha: `teste123`  
 
 ---
 
