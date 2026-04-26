@@ -5,18 +5,18 @@ import { createHashRouter, RouterProvider } from "react-router-dom";
 import ProtectedRoute from "./Protected.route.tsx";
 import { Toaster } from "react-hot-toast";
 // Telas - Clientes
-import Home from "./pages/Home";
-import Cardapio from "./pages/Cardapio";
-import Item from "./pages/Item";
-import Carrinho from "./pages/Carrinho";
-import Karaoke from "./pages/Karaoke";
+import Home from "./pages/Home.tsx";
+import Cardapio from "./pages/Cardapio.tsx";
+import Item from "./pages/Item.tsx";
+import Carrinho from "./pages/Carrinho.tsx";
+import Karaoke from "./pages/Karaoke.tsx";
 // Telas - Admin
-import Login from "./pages/Login";
-import AdminLayout from "./components/AdminLayout";
-import Dashboard from "./pages/Dashboard";
-import Mesas from "./pages/Mesas";
-import Cozinha from "./pages/Cozinha";
-import KaraokeControl from "./pages/KaraokeControl";
+import Login from "./pages/Login.tsx";
+import AdminLayout from "./components/AdminLayout.tsx";
+import Dashboard from "./pages/Dashboard.tsx";
+import Mesas from "./pages/Mesas.tsx";
+import Cozinha from "./pages/Cozinha.tsx";
+import KaraokeControl from "./pages/KaraokeControl.tsx";
 // import Pedidos from './pages/Pedidos';
 // import Gerenciar from './pages/Gerenciar';
 // Styles
