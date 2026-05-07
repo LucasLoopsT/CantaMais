@@ -1,0 +1,163 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --- Enums (status padronizados) ---
+
+enum TypeStatus {
+  LIVRE     @map("LIVRE")
+  EM_USO     @map("EM USO")
+  OCUPADA   @map("OCUPADA")
+  RESERVADA @map("RESERVADA")
+}
+
+enum PedidoStatus {
+  PREPARANDO @map("preparando")
+  PRONTO     @map("pronto")
+  ENTREGUE   @map("entregue")
+  CANCELADO  @map("cancelado")
+}
+
+enum KaraokeStatus {
+  AGUARDANDO @map("aguardando")
+  CANTANDO   @map("cantando")
+  CANTOU     @map("cantou")
+}
+
+// --- Models ---
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  level     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// Configuração global do estabelecimento (uma única linha, id = 1).
+model AppSetting {
+  id                   Int      @id @default(1)
+  taxaKaraokePorPessoa Float    @default(0) @map("taxa_karaoke_por_pessoa")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+
+  @@map("app_settings")
+}
+
+model SalaKaraoke {
+  id             Int             @id @default(autoincrement())
+  nome           String
+  roundAtual     Int             @default(1)
+  createdAt      DateTime        @default(now())
+  mesas          Mesa[]
+  karaokePedidos KaraokePedido[]
+}
+
+model Mesa {
+  id             Int             @id @default(autoincrement())
+  numero         Int
+  qtClientes     Int             @default(0) @map("qt_clientes")
+  status         TypeStatus      @default(LIVRE)
+  musicas        Int             @default(2)
+  musicasDefault Int             @default(2)
+  karaokeId      Int?            @map("karaoke_id")
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  salaKaraoke    SalaKaraoke?    @relation(fields: [karaokeId], references: [id])
+  comandas       Comanda[]
+  pedidos        Pedido[]
+  karaokePedidos KaraokePedido[]
+}
+
+model Comanda {
+  id             Int             @id @default(autoincrement())
+  pessoas        Int             @default(1)
+  status         TypeStatus      @default(LIVRE)
+  mesaId         Int?            @map("mesa_id")
+  numero         Int?            @map("numero_comanda")
+  nome           String?         @map("nome_comanda") @db.VarChar(120)
+  createdAt      DateTime        @default(now())
+  mesa           Mesa?           @relation(fields: [mesaId], references: [id])
+  pedidos        Pedido[]
+  karaokePedidos KaraokePedido[]
+
+  @@index([mesaId, numero])
+}
+
+model Produto {
+  id          Int      @id @default(autoincrement())
+  nome        String
+  preco       Float
+  disponivel  Boolean  @default(true)
+  categoria   String[]
+  descricao   String?
+  imagem      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  extrasPermitidos ProdutoExtra[] @relation("ProdutoPrincipal")
+  vinculosComoExtra ProdutoExtra[] @relation("ProdutoComoExtra")
+  pedidoItems      PedidoItem[]
+}
+
+model ProdutoExtra {
+  id             Int @id @default(autoincrement())
+  produtoId      Int @map("produto_id")
+  extraProdutoId Int @map("extra_produto_id")
+
+  produto      Produto @relation("ProdutoPrincipal", fields: [produtoId], references: [id], onDelete: Cascade)
+  extraProduto Produto @relation("ProdutoComoExtra", fields: [extraProdutoId], references: [id], onDelete: Cascade)
+
+  @@unique([produtoId, extraProdutoId])
+  @@index([produtoId])
+  @@index([extraProdutoId])
+}
+
+model Pedido {
+  id        Int          @id @default(autoincrement())
+  mesaId    Int          @map("mesa_id")
+  comandaId Int          @map("comanda_id")
+  status    PedidoStatus @default(PREPARANDO)
+  createdAt DateTime     @default(now())
+  mesa      Mesa         @relation(fields: [mesaId], references: [id])
+  comanda   Comanda      @relation(fields: [comandaId], references: [id])
+  items     PedidoItem[]
+}
+
+model PedidoItem {
+  id          Int      @id @default(autoincrement())
+  pedidoId    Int      @map("pedido_id")
+  produtoId   Int      @map("produto_id")
+  nome        String
+  preco       Float
+  quantidade  Int
+  extras      Json?
+  observacao  String?  @db.VarChar(500)
+  pedido      Pedido   @relation(fields: [pedidoId], references: [id])
+  produto     Produto  @relation(fields: [produtoId], references: [id])
+}
+
+model KaraokePedido {
+  id            Int           @id @default(autoincrement())
+  salaKaraokeId Int           @map("sala_karaoke_id")
+  mesaId        Int           @map("mesa_id")
+  comandaId     Int           @map("comanda_id")
+  nomeMusica    String        @map("nome_musica")
+  artista       String
+  link          String
+  status        KaraokeStatus @default(AGUARDANDO)
+  ordem         Int
+  round         Int           @default(1)
+  createdAt     DateTime      @default(now()) @map("created_at")
+  salaKaraoke   SalaKaraoke   @relation(fields: [salaKaraokeId], references: [id])
+  mesa          Mesa          @relation(fields: [mesaId], references: [id])
+  comanda       Comanda       @relation(fields: [comandaId], references: [id])
+
+  @@index([salaKaraokeId, ordem])
+}
