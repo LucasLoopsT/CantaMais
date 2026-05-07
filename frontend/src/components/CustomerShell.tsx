@@ -75,7 +75,7 @@ export default function CustomerShell({
                   Cardápio
                 </NavLink>
                 <NavLink to="/karaoke" className={customerMainNavClass}>
-                  Fila
+                  Karaokê
                 </NavLink>
                 <NavLink to="/carrinho" className={customerMainNavClass}>
                   Carrinho

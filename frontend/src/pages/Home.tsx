@@ -85,7 +85,7 @@ function Home() {
                 Cardápio
               </NavLink>
               <NavLink to="/karaoke" className={customerMainNavClass}>
-                Fila
+                Karaokê
               </NavLink>
               <NavLink to="/carrinho" className={customerMainNavClass}>
                 Carrinho
@@ -112,9 +112,9 @@ function Home() {
                   .
                 </h1>
                 <p className="max-w-xl text-base leading-relaxed text-pink-100/70 sm:text-lg">
-                  Monte seu pedido pelo cardápio, acompanhe o carrinho e entre na
-                  fila do karaokê sem sair da mesa — tudo no celular, no clima do
-                  bar.
+                  Monte seu pedido pelo cardápio, acompanhe o carrinho e entre
+                  na fila do karaokê sem sair da mesa — tudo no celular, no
+                  clima do bar.
                 </p>
               </div>
 

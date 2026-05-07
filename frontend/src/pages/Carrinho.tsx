@@ -1,67 +1,58 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import CustomerShell from "../components/CustomerShell";
 import CartItem from "../components/CartItem";
+import Field from "../components/Field";
 import { FaCartPlus } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { BiFoodMenu } from "react-icons/bi";
+import { MdTableBar } from "react-icons/md";
 import toast from "react-hot-toast";
-
-const initialCart = [
-  {
-    id: 1,
-    name: "Classic Burger",
-    price: 24.9,
-    img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd",
-    quantity: 1,
-    extras: [
-      { id: 1, name: "Batata Frita", price: 8, quantity: 1 },
-      { id: 1, name: "Batata Frita", price: 8, quantity: 1 },
-      { id: 1, name: "Batata Frita", price: 8, quantity: 1 },
-      { id: 1, name: "Batata Frita", price: 8, quantity: 1 },
-      { id: 1, name: "Batata Frita", price: 8, quantity: 1 },
-    ],
-    available: true,
-  },
-  {
-    id: 2,
-    name: "Bacon Smash",
-    price: 27.9,
-    img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-TxLc_svUBldQYxUXpeDUTs73K9Q27xcaDg&s",
-    quantity: 2,
-    extras: [],
-    available: true,
-  },
-];
+import { api } from "../lib/api";
+import { loadCart, saveCart, type CartLine } from "../lib/cartStorage";
 
 export default function Carrinho() {
-  const [cart, setCart] = useState(initialCart);
+  const [cart, setCart] = useState<CartLine[]>(() => loadCart());
   const [openModal, setOpenModal] = useState(false);
-  const [tableId, setTableId] = useState("");
+  const [comandaNumeroStr, setComandaNumeroStr] = useState("");
+  const [mesaNumero, setmesaNumero] = useState<number | null>(null);
 
   const [itemToRemove, setItemToRemove] = useState<{
-    id: number;
+    lineId: string;
     name: string;
   } | null>(null);
 
-  function increase(id: number) {
+  useEffect(() => {
+    saveCart(cart);
+  }, [cart]);
+
+  useEffect(() => {
+    const onFocus = () => setCart(loadCart());
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
+  }, []);
+
+  function increase(lineId: string) {
     setCart((prev) =>
       prev.map((item) =>
-        item.id === id ? { ...item, quantity: item.quantity + 1 } : item,
+        item.lineId === lineId
+          ? { ...item, quantity: item.quantity + 1 }
+          : item,
       ),
     );
   }
 
-  function decrease(id: number) {
+  function decrease(lineId: string) {
     setCart((prev) =>
       prev.map((item) =>
-        item.id === id && item.quantity > 1
+        item.lineId === lineId && item.quantity > 1
           ? { ...item, quantity: item.quantity - 1 }
           : item,
       ),
     );
   }
 
-  function remove(id: number) {
-    setCart((prev) => prev.filter((item) => item.id !== id));
+  function removeLine(lineId: string) {
+    setCart((prev) => prev.filter((item) => item.lineId !== lineId));
     toast.success("Produto removido do carrinho");
   }
 
@@ -70,37 +61,66 @@ export default function Carrinho() {
       (sum, extra) => sum + extra.price * extra.quantity,
       0,
     );
-
     return acc + (item.price + extrasTotal) * item.quantity;
   }, 0);
 
-  function confirmOrder() {
-    if (!tableId) return toast.error("Digite o ID da comanda");
+  async function confirmOrder() {
+    if (!comandaNumeroStr.trim()) {
+      return toast.error("Digite o número da comanda");
+    }
 
-    console.log("Pedido enviado", {
-      tableId,
-      items: cart,
-    });
+    if (!mesaNumero) {
+      return toast.error("Digite o número da mesa");
+    }
 
-    toast.success(`Pedido enviado para a comanda ${tableId}`);
+    const comandaNumero = Number.parseInt(comandaNumeroStr, 10);
 
-    setCart([]);
-    setTableId("");
-    setOpenModal(false);
+    if (!Number.isFinite(comandaNumero) || comandaNumero < 1) {
+      return toast.error("Número da comanda inválido");
+    }
+
+    try {
+      const { data: pedido } = await api.post<{ id: number }>("/pedidos", {
+        mesaNumero,
+        comandaNumero,
+      });
+
+      for (const line of cart) {
+        await api.post(`/pedidos/${pedido.id}/items`, {
+          produtoId: line.id,
+          quantidade: line.quantity,
+          extras:
+            line.extras.length > 0
+              ? line.extras.map((e) => ({
+                  extraProdutoId: e.id,
+                  quantidade: e.quantity,
+                }))
+              : undefined,
+          observacao: line.observacao?.trim() || null,
+        });
+      }
+
+      toast.success(`Pedido #${pedido.id} enviado`);
+
+      setCart([]);
+      saveCart([]);
+      setComandaNumeroStr("");
+      setOpenModal(false);
+    } catch (err: any) {
+      const msg = err?.response?.data?.error;
+      toast.error(msg ?? "Erro ao validar comanda");
+    }
   }
 
   return (
-    <CustomerShell
-      title="Carrinho"
-      description="Revise e envie para a cozinha"
-    >
+    <CustomerShell title="Carrinho" description="Revise e envie para a cozinha">
       <div className="flex min-h-[min(60vh,28rem)] flex-col gap-6">
         {cart.length > 0 ? (
           <>
             <div className="flex-1 space-y-4">
               {cart.map((item) => (
                 <CartItem
-                  key={item.id}
+                  key={item.lineId}
                   item={item}
                   increase={increase}
                   decrease={decrease}
@@ -109,7 +129,7 @@ export default function Carrinho() {
               ))}
             </div>
 
-            <div className="sticky bottom-0 -mx-4 mt-auto border-t border-white/10 bg-purple-4/80 px-4 py-4 backdrop-blur-md sm:-mx-6 sm:px-6">
+            <div className="sticky bottom-0 -mx-4 mt-auto px-4 py-4 sm:-mx-6 sm:px-6">
               <button
                 type="button"
                 onClick={() => setOpenModal(true)}
@@ -143,19 +163,41 @@ export default function Carrinho() {
 
       {openModal && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md space-y-4 rounded-2xl border border-white/10 bg-purple-4/95 p-6 shadow-2xl backdrop-blur-md">
+          <div className="w-full max-w-md space-y-4 rounded-2xl border border-white/10 bg-purple-4/95 p-6 shadow-2xl backdrop-blur-md text-center">
             <h2 className="text-lg font-semibold text-white">
               Confirmar pedido
             </h2>
             <p className="text-sm text-pink-100/70">
-              Informe o número da sua comanda para enviar o pedido à cozinha.
+              Informe os campos abaixo para enviar o pedido.
             </p>
-            <input
-              placeholder="ID da comanda"
-              value={tableId}
-              onChange={(e) => setTableId(e.target.value)}
-              className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white outline-none ring-pink-500/30 placeholder:text-pink-200/40 focus:ring-2"
-            />
+            <Field
+              label="Comanda"
+              icon={<BiFoodMenu className="text-lg mr-1 text-pink-300" />}
+            >
+              <input
+                type="number"
+                min={1}
+                placeholder="Número da comanda"
+                value={comandaNumeroStr}
+                onChange={(e) => setComandaNumeroStr(e.target.value)}
+                className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white outline-none ring-pink-500/30 placeholder:text-pink-200/40 focus:ring-2"
+              />
+            </Field>
+            <Field
+              label="Mesa"
+              icon={<MdTableBar className="text-lg mr-1 text-pink-300" />}
+            >
+              <input
+                type="number"
+                min={1}
+                placeholder="Número da Mesa"
+                value={mesaNumero ?? ""}
+                onChange={(e) =>
+                  setmesaNumero(parseInt(e.target.value) || null)
+                }
+                className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white outline-none ring-pink-500/30 placeholder:text-pink-200/40 focus:ring-2"
+              />
+            </Field>
             <div className="flex gap-3">
               <button
                 type="button"
@@ -196,7 +238,7 @@ export default function Carrinho() {
               <button
                 type="button"
                 onClick={() => {
-                  remove(itemToRemove.id);
+                  removeLine(itemToRemove.lineId);
                   setItemToRemove(null);
                 }}
                 className="flex-1 cursor-pointer rounded-xl bg-red-600 py-2 text-white transition hover:bg-red-700"

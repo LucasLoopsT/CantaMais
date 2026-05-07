@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { FaGears } from "react-icons/fa6";
+import { api } from "../lib/api";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -9,20 +10,27 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  function handleLogin(e: React.FormEvent) {
+  async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-
-    setTimeout(() => {
-      if (email === "teste@gmail.com" && password === "teste123") {
-        toast.success("Login realizado com sucesso!");
-        localStorage.setItem("adminAuth", "true");
-        navigate("/admin/dashboard");
-      } else {
-        toast.error("Email ou senha inválidos");
-      }
+    try {
+      const { data } = await api.post<{
+        token: string;
+        user: { id: number; name: string; email: string; level: string };
+      }>("/users/login", {
+        email,
+        password,
+      });
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("adminAuth", "true");
+      localStorage.setItem("user", JSON.stringify(data.user));
+      toast.success("Login realizado com sucesso!");
+      navigate("/admin/dashboard");
+    } catch {
+      toast.error("Email ou senha inválidos");
+    } finally {
       setLoading(false);
-    }, 800);
+    }
   }
 
   return (
@@ -34,11 +42,10 @@ export default function Login() {
           <h1 className="text-2xl font-bold text-white text-center mb-4 border-b-4 border-pink-400/50 pb-2">
             Administração Canta Mais
           </h1>
-          <p className="text-white">
-            Login: <span className="text-pink-300">teste@gmail.com</span>
-          </p>
-          <p className="text-white">
-            Senha: <span className="text-pink-300">teste123</span>
+          <p className="text-white text-sm text-center text-pink-100/80">
+            Acesse com um usuário existente. Novos usuários são criados em{" "}
+            <strong className="text-pink-200">Cadastros</strong> por um admin
+            (ou via seed no banco).
           </p>
         </div>
 

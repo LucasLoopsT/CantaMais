@@ -15,10 +15,13 @@ import Login from "./pages/Login.tsx";
 import AdminLayout from "./components/AdminLayout.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import Mesas from "./pages/Mesas.tsx";
+import RequireRecepcaoOuAdmin from "./components/RequireRecepcaoOuAdmin.tsx";
 import Cozinha from "./pages/Cozinha.tsx";
 import KaraokeControl from "./pages/KaraokeControl.tsx";
-// import Pedidos from './pages/Pedidos';
-// import Gerenciar from './pages/Gerenciar';
+import AdminCadastros from "./pages/AdminCadastros.tsx";
+import FechamentoComanda from "./pages/FechamentoComanda.tsx";
+import Faturamento from "./pages/Faturamento.tsx";
+import RequireAdmin from "./components/RequireAdmin.tsx";
 // Styles
 import "./index.css";
 import "slick-carousel/slick/slick.css";
@@ -65,8 +68,37 @@ const router = createHashRouter([
             element: <Dashboard />,
           },
           {
+            path: "cadastros",
+            element: (
+              <RequireAdmin>
+                <AdminCadastros />
+              </RequireAdmin>
+            ),
+          },
+          {
+            path: "faturamento",
+            element: (
+              <RequireAdmin>
+                <Faturamento />
+              </RequireAdmin>
+            ),
+          },
+
+          {
             path: "mesas",
-            element: <Mesas />,
+            element: (
+              <RequireRecepcaoOuAdmin>
+                <Mesas />
+              </RequireRecepcaoOuAdmin>
+            ),
+          },
+          {
+            path: "fechamento-comanda",
+            element: (
+              <RequireRecepcaoOuAdmin>
+                <FechamentoComanda />
+              </RequireRecepcaoOuAdmin>
+            ),
           },
           {
             path: "cozinha",

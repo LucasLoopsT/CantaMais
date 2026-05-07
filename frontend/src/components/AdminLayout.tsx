@@ -1,6 +1,15 @@
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { FaHome, FaUtensils, FaChair, FaMusic } from "react-icons/fa";
+import {
+  FaHome,
+  FaUtensils,
+  FaMusic,
+  FaClipboardList,
+  FaChair,
+  FaMoneyBillWave,
+} from "react-icons/fa";
+import { FaChartColumn } from "react-icons/fa6";
+import { readStoredUser } from "./RequireAdmin";
 import {
   RiArrowGoBackFill,
   RiMenuLine,
@@ -10,12 +19,60 @@ import {
 } from "react-icons/ri";
 import logo from "../assets/logo-transparent.png";
 
-const menuItems = [
-  { link: "/admin/dashboard", label: "Dashboard", icon: <FaHome /> },
-  { link: "/admin/mesas", label: "Mesas", icon: <FaChair /> },
-  { link: "/admin/cozinha", label: "Cozinha", icon: <FaUtensils /> },
-  { link: "/admin/karaoke", label: "Karaoke", icon: <FaMusic /> },
-];
+const menuDashboard = {
+  link: "/admin/dashboard",
+  label: "Dashboard",
+  icon: <FaHome />,
+};
+const menuMesas = {
+  link: "/admin/mesas",
+  label: "Mesas",
+  icon: <FaChair />,
+};
+const menuCozinha = {
+  link: "/admin/cozinha",
+  label: "Cozinha",
+  icon: <FaUtensils />,
+};
+const menuKaraoke = {
+  link: "/admin/karaoke",
+  label: "Karaoke",
+  icon: <FaMusic />,
+};
+const menuCadastros = {
+  link: "/admin/cadastros",
+  label: "Cadastros",
+  icon: <FaClipboardList />,
+};
+const menuFechamento = {
+  link: "/admin/fechamento-comanda",
+  label: "Fechamento",
+  icon: <FaMoneyBillWave />,
+};
+const menuFaturamento = {
+  link: "/admin/faturamento",
+  label: "Faturamento",
+  icon: <FaChartColumn />,
+};
+
+function buildMenuItems() {
+  const level = readStoredUser()?.level;
+  if (level === "ADMIN") {
+    return [
+      menuDashboard,
+      menuCadastros,
+      menuMesas,
+      menuCozinha,
+      menuKaraoke,
+      menuFechamento,
+      menuFaturamento,
+    ];
+  }
+  if (level === "RECEPCAO") {
+    return [menuDashboard, menuMesas, menuFechamento];
+  }
+  return [menuDashboard, menuCozinha, menuKaraoke];
+}
 
 const LG = 1024;
 
@@ -46,8 +103,12 @@ export default function AdminLayout() {
 
   const handleLogout = () => {
     localStorage.removeItem("adminAuth");
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     navigate("/login");
   };
+
+  const menuItems = buildMenuItems();
 
   const linkStyle = ({ isActive }: { isActive: boolean }) =>
     `flex items-center gap-3 rounded-lg transition shrink-0 ${
